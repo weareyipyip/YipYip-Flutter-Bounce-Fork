@@ -106,6 +106,16 @@ class BounceState extends State<Bounce> with SingleTickerProviderStateMixin {
 
   bool isLongPressing = false, isCancelled = false;
 
+  /// Checks if the widget is used in a scrollable widget
+  bool isInScrollableWidget(BuildContext context) {
+    try {
+      Scrollable.of(context);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   @override
   void initState() {
     _controller = AnimationController(vsync: this, duration: widget.duration, value: 0);
@@ -122,7 +132,7 @@ class BounceState extends State<Bounce> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) => GestureDetector(
       behavior: HitTestBehavior.deferToChild,
       onTapDown: _onTapDown,
-      onPanUpdate: _onPointerMove,
+      onPanUpdate: isInScrollableWidget(context) ? null : _onPointerMove, // Disable the pan gesture update when the widget is used in a scrollable widget
       onTapCancel: _onTapCancel,
       onTapUp: _onPointerUp,
       onSecondaryTapUp: (details) => widget.onSecondaryTapUp?.call(details),
